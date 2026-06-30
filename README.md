@@ -1,97 +1,100 @@
 <div align="center">
 
-<img src="KitchenInventory/Assets.xcassets/AppIcon.appiconset/AppIcon.png" width="120" alt="囤囤鼠 App 图标" />
+**English** · [简体中文](README.zh-CN.md)
 
-# 囤囤鼠 · KitchenInventory
+<img src="KitchenInventory/Assets.xcassets/AppIcon.appiconset/AppIcon.png" width="120" alt="KitchenInventory app icon" />
 
-**说一句话，就管好家里的厨房库存。**
+# KitchenInventory · 囤囤鼠
 
-一个本地优先、语音驱动的个人厨房食材管理 iOS App，用 SwiftUI + SwiftData 构建。
+**Say one sentence, and your kitchen stock is handled.**
+
+A local-first, voice-driven personal kitchen inventory app for iOS, built with SwiftUI + SwiftData.
 
 </div>
 
 ---
 
-## 这是什么
+## What is this
 
-「家里还有什么？」「该买什么了？」——囤囤鼠就为解决这两个日常问题。
+"What do we still have at home?" "What do I need to buy?" — KitchenInventory exists to answer exactly these two everyday questions.
 
-它的设计围绕几条原则：
+Its design follows a few principles:
 
-- **本地优先 / 隐私优先 / 零延迟**：语音识别在设备本地完成，无云同步、无账号体系。
-- **说而不打**：录入靠说话，不靠打字。
-- **管状态，不管数量**：只关心「有 / 快没了 / 没了」，而不是数有几个——更贴近真实做饭决策。
-- **一切可撤销，不弹确认框**：每个破坏性操作都带撤销，不用确认弹窗打断你。
+- **Local-first / Privacy-first / Zero-latency**: speech recognition runs entirely on-device — no cloud sync, no accounts.
+- **Speak, don't type**: you add items by talking, not typing.
+- **Track state, not quantity**: it only cares about "have / running low / out" rather than counting units — closer to how real cooking decisions are made.
+- **Everything is undoable, no confirmation dialogs**: every destructive action comes with an undo, so nothing interrupts you with an "Are you sure?".
 
-## 功能
+## Features
 
-### 已上线
+### Shipped
 
-| | 功能 |
+| | Feature |
 |---|---|
-| 🎙️ | **语音采购清单**——说话即可加入 / 删除 / 归到某超市 / 标记「没了」，每步都可撤销 |
-| 🧊 | **智能库存三层视图**——生鲜 / 干货 / 常备 自动分层，长按可在分类间移动 |
-| 🏪 | **超市管理**——侧滑删除 / 重命名 / 合并；同名自动合并去重 |
-| 🔤 | **食材身份去重**——同名即同物，连说「桃子桃子桃子」也只记一个 |
-| 🔁 | **状态轮转**——有 → 快没了 → 没了，用完自动回到待买清单 |
-| 📦 | **首次启动预置** 12 种常备品（盐、糖、油、酱油……） |
-| 🐹 | **自定义 App 图标**（仓鼠抱购物袋） |
+| 🎙️ | **Voice shopping list** — add / remove / assign to a store / mark "out" just by speaking; every action is undoable |
+| 🧊 | **Smart three-tier inventory** — Fresh / Dry goods / Staples, auto-grouped; long-press to move an item between tiers |
+| 🏪 | **Store management** — swipe to delete / rename / merge; same-name stores merge automatically |
+| 🔤 | **Grocery identity dedup** — same name means same item; even saying "peach peach peach" records just one |
+| 🔁 | **Status cycle** — have → running low → out; once out, it automatically returns to the shopping list |
+| 📦 | **First-launch seed** of 12 staples (salt, sugar, oil, soy sauce, …) |
+| 🐹 | **Custom app icon** (a hamster hugging a shopping bag) |
 
-### 开发中
+### In progress
 
-| | 功能 |
+| | Feature |
 |---|---|
-| 🧾 | **小票识别**——Vision OCR（`ReceiptScanner`）+ 纯规则解析（`ReceiptParser`）+ 复核界面（`ReceiptReviewView`）。代码已就绪并参与编译，尚未接入主界面 Tab。 |
+| 🧾 | **Receipt scanning** — Vision OCR (`ReceiptScanner`) + rule-based parsing (`ReceiptParser`) + a review screen (`ReceiptReviewView`). The code is ready and compiles, but it is not yet wired into a main tab. |
 
-## 技术栈
+## Tech stack
 
-- **SwiftUI** —— 全部界面
-- **SwiftData** —— 本地持久化（`@Model`、`@Attribute(.unique)` 保证食材身份唯一）
-- **Speech / SFSpeechRecognizer** —— 本地语音识别（锁定 `zh_CN`，流式上屏）
-- **AVFoundation** —— 录音
-- **Vision** —— 小票 OCR（开发中）
-- 部署目标 **iOS 17.0+**，Swift 6（默认 MainActor 隔离）
+- **SwiftUI** — the entire UI
+- **SwiftData** — local persistence (`@Model`; `@Attribute(.unique)` enforces grocery identity)
+- **Speech / SFSpeechRecognizer** — on-device speech recognition (locked to `zh_CN`, streaming transcription)
+- **AVFoundation** — audio recording
+- **Vision** — receipt OCR (in progress)
+- Deployment target **iOS 17.0+**, Swift 6 (default MainActor isolation)
 
-## 工程结构
+## Project structure
 
-| 文件 | 职责 |
+| File | Responsibility |
 |---|---|
-| `ContentView.swift` | `@main` 入口 + TabView + 首次启动预置 |
-| `Models.swift` | `Grocery`（三分类 / 三状态 / 唯一名）与 `Supermarket` 数据模型 |
-| `GroceryActions.swift` | 全部业务逻辑：语音指令执行、CRUD、超市管理、预置 |
-| `TextParser.swift` | 中文断句 + 重复折叠 + 语音指令解析 |
-| `SpeechManager.swift` | `SFSpeechRecognizer` 本地语音识别封装 |
-| `ShoppingListView.swift` | 采购清单 Tab + 超市选择/管理 |
-| `InventoryView.swift` | 库存 Tab，三层分组 + 长按移动分类 |
-| `ReceiptParser.swift` | 小票文本解析（纯规则，开发中） |
-| `ReceiptScanner.swift` | Vision OCR 扫描小票（开发中） |
-| `ReceiptReviewView.swift` | 小票识别结果复核界面（开发中） |
+| `ContentView.swift` | `@main` entry + TabView + first-launch seeding |
+| `Models.swift` | `Grocery` (three tiers / three states / unique name) and `Supermarket` data models |
+| `GroceryActions.swift` | All business logic: voice command execution, CRUD, store management, seeding |
+| `TextParser.swift` | Chinese sentence splitting + repeat collapsing + voice command parsing |
+| `SpeechManager.swift` | `SFSpeechRecognizer` on-device speech recognition wrapper |
+| `ShoppingListView.swift` | Shopping list tab + store picker / management |
+| `InventoryView.swift` | Inventory tab, three-tier grouping + long-press to move tier |
+| `ReceiptParser.swift` | Receipt text parsing (pure rules, in progress) |
+| `ReceiptScanner.swift` | Vision OCR receipt scanning (in progress) |
+| `ReceiptReviewView.swift` | Receipt result review screen (in progress) |
 | `KitchenInventory/Assets.xcassets/` | AppIcon + AccentColor |
 
-## 数据模型要点
+## Data model notes
 
-- `Grocery`：`@Attribute(.unique) name`——**同名即同物**
-  - 分类 `typeValue`：`fresh`（生鲜）/ `dry`（干货）/ `staple`（常备）
-  - 状态 `statusValue`：`have` / `runningLow` / `none`
-  - `isOnShoppingList`、`store`（可选关联超市，`.nullify`）、`isStorePinned`
-- `Supermarket`：删除规则 `.nullify`，食材不会被连带删除
+- `Grocery`: `@Attribute(.unique) name` — **same name means same item**
+  - tier `typeValue`: `fresh` / `dry` / `staple`
+  - state `statusValue`: `have` / `runningLow` / `none`
+  - `isOnShoppingList`, `store` (optional supermarket link, `.nullify`), `isStorePinned`
+- `Supermarket`: delete rule `.nullify`, so deleting a store never cascades into deleting groceries
 
-## 构建运行
+## Build & run
 
-1. 用 Xcode 打开 `KitchenInventory.xcodeproj`（开发环境为 Xcode 26 / iOS 17 SDK）。
-2. 在 **Signing & Capabilities** 选择你自己的 Apple 开发者 Team。
-3. 选真机或模拟器运行。
+1. Open `KitchenInventory.xcodeproj` in Xcode (developed with Xcode 26 / iOS 17 SDK).
+2. Under **Signing & Capabilities**, select your own Apple developer Team.
+3. Run on a device or simulator.
 
-> **权限**：App 需要麦克风、语音识别、相机权限，均配置在工程的 `INFOPLIST_KEY_*`（本工程用 `GENERATE_INFOPLIST_FILE`，无独立 Info.plist）。缺少麦克风 / 语音权限会导致启动崩溃。
+> **Permissions**: the app needs microphone, speech recognition, and camera access, all configured via the project's `INFOPLIST_KEY_*` (this project uses `GENERATE_INFOPLIST_FILE`, with no standalone Info.plist). Missing microphone / speech permission will crash the app on launch.
 
-## 已知局限
+## Known limitations
 
-- 「和 / 跟」作为分隔符时，可能误伤含这些字的食材名（如「和牛」），但命中率极低。
-- 无分隔符的连写中文不会自动拆分（如「青椒土豆」会被当成一个整体）——留给后续模型方案。
-- 语音 locale 锁定 `zh_CN`，中英混说受限，英文店名建议手动输入。
+- The app is built around **Mandarin Chinese voice input** (UI and recognition are in Chinese).
+- When "和 / 跟" (Chinese for "and / with") is used as a separator, it may mis-split grocery names that contain those characters (e.g. "和牛" / wagyu) — though this is rare.
+- Continuous Chinese without separators is not auto-split (e.g. "青椒土豆" / "bell pepper potato" is treated as a single item) — left to a future model-based approach.
+- The speech locale is locked to `zh_CN`, so mixed Chinese-English is limited; English store names are best entered manually.
 
 ---
 
 <div align="center">
-个人项目 · 自用工具 🐹
+A personal project · a tool built for myself 🐹
 </div>
