@@ -1,0 +1,128 @@
+import SwiftUI
+import SwiftData
+
+/// 拍小票后的「预览校对页」：OCR 噪声大，先让用户增删改，确认后才入库。
+/// 这是录入校对，不是「确认吗」拦截弹窗 —— 入库后仍给整批撤销。
+struct ReceiptReviewView: View {
+    @Environment(\.modelContext) private var context
+    @Environment(\.dismiss) private var dismiss
+    @Query(sort: \Supermarket.name) private var stores: [Supermarket]
+
+    let parsed: ParsedReceipt
+    var onImported: (ActionResult) -> Void
+
+    @State private var rows: [ReviewRow]
+    @State private var storeName: String
+    @State private var date: Date
+    @State private var renamingRow: ReviewRow?
+    @State private var renameText = ""
+
+    init(parsed: ParsedReceipt, onImported: @escaping (ActionResult) -> Void) {
+        self.parsed = parsed
+        self.onImported = onImported
+        _rows = State(initialValue: parsed.items.map { ReviewRow(name: $0, include: true) })
+        _storeName = State(initialValue: parsed.storeName ?? "")
+        _date = State(initialValue: parsed.date ?? Date())
+    }
+
+    private var chosenCount: Int { rows.filter { $0.include }.count }
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section("归到哪家店") {
+                    TextField("店名（留空 = 不限超市）", text: $storeName)
+                    if !stores.isEmpty {
+                        Menu("从已有超市选") {
+                            ForEach(stores) { s in
+                                Button(s.name) { storeName = s.name }
+                            }
+                        }
+                        .font(.subheadline)
+                    }
+                }
+
+                Section("购买时间") {
+                    DatePicker("买于", selection: $date, displayedComponents: .date)
+                }
+
+                Section {
+                    if rows.isEmpty {
+                        Text("没识别到商品，可关闭后手动添加").foregroundStyle(.secondary)
+                    }
+                    ForEach($rows) { $row in
+                        HStack(spacing: 12) {
+                            Button {
+                                row.include.toggle()
+                            } label: {
+                                Image(systemName: row.include ? "checkmark.circle.fill" : "circle")
+                                    .foregroundStyle(row.include ? Color.accentColor : .secondary)
+                            }
+                            .buttonStyle(.plain)
+                            Text(row.name)
+                                .foregroundStyle(row.include ? .primary : .secondary)
+                            Spacer()
+                        }
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            renameText = row.name
+                            renamingRow = row
+                        }
+                        .swipeActions(edge: .trailing) {
+                            Button(role: .destructive) {
+                                rows.removeAll { $0.id == row.id }
+                            } label: { Label("删除", systemImage: "trash") }
+                        }
+                    }
+                } header: {
+                    Text("识别到的商品")
+                } footer: {
+                    Text("勾选要入库的；点名字可改、左滑可删。识别难免有误，校对后再入库。")
+                }
+            }
+            .navigationTitle("核对小票")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("取消") { dismiss() }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button(chosenCount > 0 ? "入库 \(chosenCount) 样" : "入库") { confirmImport() }
+                        .disabled(chosenCount == 0)
+                }
+            }
+            .alert("改个名字", isPresented: Binding(
+                get: { renamingRow != nil },
+                set: { if !$0 { renamingRow = nil } })) {
+                TextField("名称", text: $renameText)
+                Button("保存") {
+                    if let r = renamingRow,
+                       let idx = rows.firstIndex(where: { $0.id == r.id }) {
+                        let t = renameText.trimmingCharacters(in: .whitespacesAndNewlines)
+                        if !t.isEmpty { rows[idx].name = t }
+                    }
+                    renamingRow = nil
+                }
+                Button("取消", role: .cancel) { renamingRow = nil }
+            }
+        }
+    }
+
+    private func confirmImport() {
+        let chosen = rows.filter { $0.include }.map { $0.name }
+        let trimmedStore = storeName.trimmingCharacters(in: .whitespacesAndNewlines)
+        let result = GroceryActions.importReceipt(
+            items: chosen,
+            storeName: trimmedStore.isEmpty ? nil : trimmedStore,
+            boughtAt: date,
+            in: context)
+        onImported(result)
+        dismiss()
+    }
+}
+
+struct ReviewRow: Identifiable {
+    let id = UUID()
+    var name: String
+    var include: Bool
+}

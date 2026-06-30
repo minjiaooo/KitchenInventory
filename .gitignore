@@ -1,0 +1,36 @@
+# ---- macOS ----
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# ---- Xcode: 用户个人状态(不应进版本库)----
+xcuserdata/
+*.xcuserstate
+*.xcuserdatad
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+
+# ---- Xcode: 构建产物 ----
+build/
+DerivedData/
+*.moved-aside
+*.hmap
+*.ipa
+*.dSYM
+*.dSYM.zip
+
+# ---- Swift Package Manager ----
+.build/
+.swiftpm/xcode/package.xcworkspace/contents.xcworkspacedata
+Package.resolved
+
+# ---- 依赖管理器(本项目未用,保险起见)----
+Pods/
+Carthage/Build/
+
+# ---- 微信小程序移植版:不纳入本仓库(本仓库只含 iOS app)----
+weapp/
+
+# ---- 其它 ----
+*.log
