@@ -2,9 +2,11 @@
 
 [English](README.md) · **简体中文**
 
-<img src="KitchenInventory/Assets.xcassets/AppIcon.appiconset/AppIcon.png" width="120" alt="囤囤鼠 App 图标" />
+<img src="KitchenInventory/Assets.xcassets/AppIcon.appiconset/AppIcon.png" width="120" alt="Stashster App 图标" />
 
-# 囤囤鼠 · KitchenInventory
+# 囤囤鼠 · Stashster
+
+> 英文名 **Stashster** = *stash*（囤货）+ 仓鼠（ham**ster**），一只爱囤货的小仓鼠 🐹
 
 **说一句话，就管好家里的厨房库存。**
 

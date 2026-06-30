@@ -2,9 +2,11 @@
 
 **English** · [简体中文](README.zh-CN.md)
 
-<img src="KitchenInventory/Assets.xcassets/AppIcon.appiconset/AppIcon.png" width="120" alt="KitchenInventory app icon" />
+<img src="KitchenInventory/Assets.xcassets/AppIcon.appiconset/AppIcon.png" width="120" alt="Stashster app icon" />
 
-# KitchenInventory · 囤囤鼠
+# Stashster · 囤囤鼠
+
+> *stash* + ham**ster** — a little hamster that loves to stock up 🐹
 
 **Say one sentence, and your kitchen stock is handled.**
 
