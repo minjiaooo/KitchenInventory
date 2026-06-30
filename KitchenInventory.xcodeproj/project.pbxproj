@@ -17,6 +17,8 @@
 		DD00000000000000000000B1 /* ReceiptParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD00000000000000000000A1 /* ReceiptParser.swift */; };
 		DD00000000000000000000B2 /* ReceiptScanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD00000000000000000000A2 /* ReceiptScanner.swift */; };
 		DD00000000000000000000B3 /* ReceiptReviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD00000000000000000000A3 /* ReceiptReviewView.swift */; };
+		DD00000000000000000000B4 /* FoodTranslator.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD00000000000000000000A4 /* FoodTranslator.swift */; };
+		DD00000000000000000000B5 /* FoodDictionary.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD00000000000000000000A5 /* FoodDictionary.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -31,6 +33,8 @@
 		DD00000000000000000000A1 /* ReceiptParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiptParser.swift; sourceTree = "<group>"; };
 		DD00000000000000000000A2 /* ReceiptScanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiptScanner.swift; sourceTree = "<group>"; };
 		DD00000000000000000000A3 /* ReceiptReviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiptReviewView.swift; sourceTree = "<group>"; };
+		DD00000000000000000000A4 /* FoodTranslator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodTranslator.swift; sourceTree = "<group>"; };
+		DD00000000000000000000A5 /* FoodDictionary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodDictionary.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -67,6 +71,8 @@
 				DD00000000000000000000A1 /* ReceiptParser.swift */,
 				DD00000000000000000000A2 /* ReceiptScanner.swift */,
 				DD00000000000000000000A3 /* ReceiptReviewView.swift */,
+				DD00000000000000000000A4 /* FoodTranslator.swift */,
+				DD00000000000000000000A5 /* FoodDictionary.swift */,
 			);
 			sourceTree = "<group>";
 		};
@@ -163,6 +169,8 @@
 				DD00000000000000000000B1 /* ReceiptParser.swift in Sources */,
 				DD00000000000000000000B2 /* ReceiptScanner.swift in Sources */,
 				DD00000000000000000000B3 /* ReceiptReviewView.swift in Sources */,
+				DD00000000000000000000B4 /* FoodTranslator.swift in Sources */,
+				DD00000000000000000000B5 /* FoodDictionary.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
