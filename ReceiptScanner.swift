@@ -52,13 +52,23 @@ private extension UIImage {
 
 // MARK: - 取图（拍照；模拟器或无相机时自动回退到相册）
 
+/// 取图来源：拍照 / 相册。给 fullScreenCover(item:) 用，所以 Identifiable。
+enum PickerSource: Identifiable {
+    case camera, library
+    var id: Int { self == .camera ? 0 : 1 }
+    var uiType: UIImagePickerController.SourceType { self == .camera ? .camera : .photoLibrary }
+}
+
 struct CameraPicker: UIViewControllerRepresentable {
+    var sourceType: UIImagePickerController.SourceType = .camera
     var onImage: (UIImage) -> Void
     @Environment(\.dismiss) private var dismiss
 
     func makeUIViewController(context: Context) -> UIImagePickerController {
         let picker = UIImagePickerController()
-        picker.sourceType = UIImagePickerController.isSourceTypeAvailable(.camera) ? .camera : .photoLibrary
+        // 选了拍照但设备无相机（模拟器）→ 回退相册，避免崩溃
+        picker.sourceType = (sourceType == .camera && !UIImagePickerController.isSourceTypeAvailable(.camera))
+            ? .photoLibrary : sourceType
         picker.delegate = context.coordinator
         return picker
     }

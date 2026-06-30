@@ -27,8 +27,9 @@ struct ShoppingListView: View {
     // 归店
     @State private var pickingStoreFor: Grocery?
 
-    // 拍小票（C1）
-    @State private var showingCamera = false
+    // 拍小票（C1）：来源二选一（拍照 / 相册）
+    @State private var showingSourceDialog = false
+    @State private var pickerSource: PickerSource?
     @State private var parsedReceipt: ParsedReceipt?
     @State private var isRecognizing = false
 
@@ -76,7 +77,7 @@ struct ShoppingListView: View {
             .navigationTitle("本周采购")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button { showingCamera = true } label: {
+                    Button { showingSourceDialog = true } label: {
                         Image(systemName: "doc.text.viewfinder")
                     }
                 }
@@ -86,8 +87,13 @@ struct ShoppingListView: View {
                     }
                 }
             }
-            .fullScreenCover(isPresented: $showingCamera) {
-                CameraPicker { image in recognizeReceipt(image) }
+            .confirmationDialog("添加小票", isPresented: $showingSourceDialog, titleVisibility: .visible) {
+                Button("拍照") { pickerSource = .camera }
+                Button("从相册选") { pickerSource = .library }
+                Button("取消", role: .cancel) {}
+            }
+            .fullScreenCover(item: $pickerSource) { source in
+                CameraPicker(sourceType: source.uiType) { image in recognizeReceipt(image) }
                     .ignoresSafeArea()
             }
             .sheet(item: $parsedReceipt) { receipt in
