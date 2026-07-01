@@ -157,6 +157,30 @@ enum GroceryActions {
         try? context.save()
     }
 
+    // 彻底删除一条食材记录（库存里清掉误建/不要的），可撤销：撤销时按快照重建
+    static func deleteGrocery(_ g: Grocery, in context: ModelContext) -> ActionResult {
+        let name = g.name
+        let type = g.type
+        let status = g.status
+        let onList = g.isOnShoppingList
+        let store = g.store
+        let pinned = g.isStorePinned
+        let bought = g.boughtAt
+        let added = g.addedToListAt
+        context.delete(g)
+        try? context.save()
+        return ActionResult(message: "已删除「\(name)」", undo: {
+            let restored = Grocery(name: name, type: type, isOnShoppingList: onList)
+            restored.status = status
+            restored.store = store
+            restored.isStorePinned = pinned
+            restored.boughtAt = bought
+            restored.addedToListAt = added
+            context.insert(restored)
+            try? context.save()
+        })
+    }
+
     static func findOrCreateStore(named name: String, in context: ModelContext) -> Supermarket {
         let target = name.lowercased()
         let all = (try? context.fetch(FetchDescriptor<Supermarket>())) ?? []
