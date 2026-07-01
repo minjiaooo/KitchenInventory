@@ -53,10 +53,18 @@ enum FoodTranslator {
         let foods: [String]
     }
 
+    /// 整单提取失败时的最后错误，用于在校对页显示、诊断真机问题。
+    static var lastError: String?
+
     /// 整张小票 OCR 文本 → 中文食材名列表。模型不可用返回 nil（调用方回退规则解析）。
     static func extractFoods(from lines: [String]) async -> [String]? {
-        guard isAvailable else { return nil }
-        let text = lines.joined(separator: "\n")
+        guard isAvailable else { lastError = "Apple Intelligence 不可用"; return nil }
+        // 预清洗：去掉纯数字 / 条码 / 符号行，只留含字母或中文的行，给设备端小模型减负
+        let cleaned = lines.filter {
+            let t = $0.trimmingCharacters(in: .whitespaces)
+            return t.count >= 2 && t.range(of: "[A-Za-z一-龥]", options: .regularExpression) != nil
+        }
+        let text = cleaned.joined(separator: "\n")
         let session = LanguageModelSession {
             """
             下面是一张购物小票的 OCR 文本，可能有噪声和缩写。
@@ -69,10 +77,12 @@ enum FoodTranslator {
         }
         do {
             let result = try await session.respond(to: text, generating: Receipt.self)
+            lastError = nil
             return result.content.foods
                 .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
                 .filter { !$0.isEmpty }
         } catch {
+            lastError = String(describing: error)
             return nil
         }
     }

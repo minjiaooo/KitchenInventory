@@ -107,7 +107,12 @@ struct ReceiptReviewView: View {
         } header: {
             Text("识别到的商品")
         } footer: {
-            Text("英文会自动转中文（词典 / 模型），可能不准——点名字可改、左滑可删。校对后再入库。")
+            VStack(alignment: .leading, spacing: 6) {
+                if let note = parsed.note {
+                    Text(note).font(.caption).foregroundStyle(.secondary)
+                }
+                Text("英文会自动转中文（词典 / 模型），可能不准——点名字可改、左滑可删。校对后再入库。")
+            }
         }
     }
 

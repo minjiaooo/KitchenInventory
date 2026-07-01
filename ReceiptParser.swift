@@ -9,6 +9,7 @@ struct ParsedReceipt: Identifiable {
     var storeName: String?
     var date: Date?
     var items: [String]
+    var note: String? = nil   // 提取来源 / 失败原因，显示在校对页底部便于诊断
 }
 
 // MARK: - 小票解析（纯规则，不接模型，可单测）

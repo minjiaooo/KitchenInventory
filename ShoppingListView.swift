@@ -221,12 +221,18 @@ struct ShoppingListView: View {
             let lines = await ReceiptOCR.recognize(image)
             let parsed = ReceiptParser.parse(lines: lines)   // 店名 / 日期仍用规则
             var items = parsed.items
+            var note: String
             // 模型可用 → 整单提取覆盖商品列表（自动过滤门店信息、还原缩写、直接中文）
-            if let foods = await FoodTranslator.extractFoods(from: lines), !foods.isEmpty {
+            if !FoodTranslator.isAvailable {
+                note = "⚠️ Apple Intelligence 不可用，用了规则解析（英文需手动改）"
+            } else if let foods = await FoodTranslator.extractFoods(from: lines), !foods.isEmpty {
                 items = foods
+                note = "✅ 由 AI 整单提取（\(foods.count) 项）"
+            } else {
+                note = "⚠️ AI 整单提取失败，已回退规则解析" + (FoodTranslator.lastError.map { "：\($0)" } ?? "")
             }
             isRecognizing = false
-            parsedReceipt = ParsedReceipt(storeName: parsed.storeName, date: parsed.date, items: items)
+            parsedReceipt = ParsedReceipt(storeName: parsed.storeName, date: parsed.date, items: items, note: note)
         }
     }
 
