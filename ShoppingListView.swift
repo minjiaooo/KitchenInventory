@@ -214,14 +214,19 @@ struct ShoppingListView: View {
         addText = ""
     }
 
-    // 拍小票：取图后本地 OCR + 规则解析，再弹「预览校对页」让用户确认
+    // 拍小票：OCR → 模型整单提取食品（主路径）/ 规则解析（兜底）→ 弹校对页
     private func recognizeReceipt(_ image: UIImage) {
         isRecognizing = true
         Task {
             let lines = await ReceiptOCR.recognize(image)
-            let parsed = ReceiptParser.parse(lines: lines)
+            let parsed = ReceiptParser.parse(lines: lines)   // 店名 / 日期仍用规则
+            var items = parsed.items
+            // 模型可用 → 整单提取覆盖商品列表（自动过滤门店信息、还原缩写、直接中文）
+            if let foods = await FoodTranslator.extractFoods(from: lines), !foods.isEmpty {
+                items = foods
+            }
             isRecognizing = false
-            parsedReceipt = parsed
+            parsedReceipt = ParsedReceipt(storeName: parsed.storeName, date: parsed.date, items: items)
         }
     }
 

@@ -44,4 +44,36 @@ enum FoodTranslator {
             return nil
         }
     }
+
+    // MARK: - 整单提取（主路径）：整张小票文本一次交给模型，直接吐中文食材列表
+
+    @Generable
+    struct Receipt {
+        @Guide(description: "小票上所有食品/食材的简洁中文名；已忽略店名、地址、税费、非食品、乱码、水印")
+        let foods: [String]
+    }
+
+    /// 整张小票 OCR 文本 → 中文食材名列表。模型不可用返回 nil（调用方回退规则解析）。
+    static func extractFoods(from lines: [String]) async -> [String]? {
+        guard isAvailable else { return nil }
+        let text = lines.joined(separator: "\n")
+        let session = LanguageModelSession {
+            """
+            下面是一张购物小票的 OCR 文本，可能有噪声和缩写。
+            只提取其中的【食品 / 食材】，逐一还原成简洁的中文名。
+            必须忽略：店名、地址、电话、会员号、日期时间、小计/税/合计/找零、
+            支付与卡号、条码流水号、非食品（肥皂/沐浴/护理/日用品）、看不懂的乱码、图片水印。
+            美国小票缩写要还原：如 BNLS SKNLS CKN=鸡胸肉、ORG=有机、KS 或 Kirkland 等自牌前缀去掉。
+            拿不准是不是食品就宁可不放。只输出食品的中文名。
+            """
+        }
+        do {
+            let result = try await session.respond(to: text, generating: Receipt.self)
+            return result.content.foods
+                .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+                .filter { !$0.isEmpty }
+        } catch {
+            return nil
+        }
+    }
 }
